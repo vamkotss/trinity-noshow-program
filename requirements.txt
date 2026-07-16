@@ -3,3 +3,5 @@ numpy
 openpyxl
 pytest
 ruff
+pyarrow
+pyarrow
