@@ -222,9 +222,15 @@ def _no_show_probability(
     if payer in ("Self-Pay", "Medicaid"):
         p += 0.07
 
-    # Patient's own reliability, and how well-run the clinic is.
+    # Patient's own reliability. The clinic-quality term is kept SMALL on
+    # purpose: most of the reminding-clinics-look-better effect must flow through
+    # the observable payer mix (assigned in build_appointments), so that an
+    # analyst who stratifies on payer can actually recover the truth. If the
+    # confound lived entirely in this hidden quality term, no amount of
+    # adjustment on observable features could remove it, and the exercise would
+    # teach the wrong lesson (that adjustment is futile).
     p -= (reliability - 0.7) * 0.25
-    p -= (clinic_quality - 0.80) * 0.30
+    p -= (clinic_quality - 0.80) * 0.08
 
     return float(np.clip(p, 0.01, 0.85))
 
@@ -257,7 +263,20 @@ def build_appointments(
         is_new = pat["mrn"] not in seen_before
         seen_before.add(pat["mrn"])
 
-        payer = str(rng.choice(PAYERS_CLEAN, p=[0.28, 0.18, 0.18, 0.14, 0.14, 0.08]))
+        # THE CONFOUND, made OBSERVABLE. The reminding clinics (the better-run,
+        # more affluent-area ones) serve a lower-risk payer mix: fewer self-pay
+        # and Medicaid patients. This is what actually drives their lower
+        # no-show rate - not the reminding. Because payer is a column the analyst
+        # CAN see, stratifying on it correctly shrinks the naive reminder effect
+        # toward zero. That is the whole lesson: the confound is adjustable if you
+        # look for it, and catastrophic if you do not.
+        if CLINICS[clinic]["reminds"]:
+            # Lower-risk mix: more commercial, less self-pay/Medicaid.
+            payer_p = [0.34, 0.22, 0.22, 0.08, 0.11, 0.03]
+        else:
+            # Higher-risk mix.
+            payer_p = [0.22, 0.14, 0.14, 0.20, 0.16, 0.14]
+        payer = str(rng.choice(PAYERS_CLEAN, p=payer_p))
 
         p_ns = _no_show_probability(
             lead_days, is_new, weekday, hour, payer,
