@@ -8,6 +8,8 @@
 >
 > A clinic-level comparison said reminder calls cut no-shows by 2.3 points. Fund it, obviously. **Except it was wrong.** The three clinics that logged reminders also served a far lower-risk patient mix — 11% self-pay/Medicaid vs 34% elsewhere. Adjusting for that, the real effect was **0.7 points with a confidence interval spanning zero.** ~70% of the "reminders work" signal was selection bias. The recommendation: run a randomised pilot, don't fund a rollout on a confounded number.
 
+
+![The reminder trap: a naive comparison said reminders cut no-shows by 2.3 points; adjusting for the confound, the real effect was 0.7 points with a confidence interval spanning zero](reports/reminder-trap.png)
 📊 **[Board deck](reports/BOARD_DECK.pptx)** · 📈 **[ROI model](reports/ROI_MODEL.xlsx)** · 📋 **[Project charter](docs/CHARTER.md)** · 🔗 **[Requirements traceability](docs/requirements/TRACEABILITY.md)**
 
 ---
